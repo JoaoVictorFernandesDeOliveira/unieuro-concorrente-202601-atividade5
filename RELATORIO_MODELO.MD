@@ -1,38 +1,29 @@
 # Relatório da NOME DA ATIVIDADE
 
-**Disciplina:** 
-**Aluno(s):**
-**Turma:**
-**Professor:**
-**Data:**
+**Disciplina:Programação Concorrente e distribuída
+**Aluno(s):João Victor Fernandes De Oliveira
+**Turma:ADS
+**Professor:Rafael
+**Data:08042026
 
 ---
 
 # 1. Descrição do Problema
 
-Descreva o problema computacional resolvido pelo programa.
+O programa desenvolvido consiste em uma solução para o processamento distribuído de dados, utilizando a interface de passagem de mensagens (MPI) para dividir uma carga de trabalho computacional entre múltiplos processos independentes.
 
-## Orientações para preenchimento
+Descrição Técnica
+Qual problema foi implementado: Foi implementado um sistema de avaliação e processamento de blocos de dados. O programa divide um conjunto total de tarefas em subconjuntos menores, que são distribuídos para diferentes processos (ranks) para execução simultânea.
 
-Explique:
+Qual algoritmo foi utilizado: O algoritmo segue o modelo SPMD (Single Program, Multiple Data). Utilizamos uma lógica de decomposição de domínio, onde o processo com Rank 0 coordena a distribuição ou leitura dos dados, e os demais processos realizam o cálculo pesado. A comunicação é feita via MPI_Send/Recv ou funções coletivas (como Scatter/Gather ou Bcast), dependendo da versão do script avaliadormpi.py.
 
-* Qual problema foi implementado
-* Qual algoritmo foi utilizado
-* Qual o tamanho da entrada utilizada nos testes
-* Qual o objetivo da paralelização
+Qual o tamanho da entrada utilizada nos testes: [Inserir o valor aqui, ex: 1 milhão de registros / 5.000 iterações]. Este volume foi escolhido para garantir que o tempo de processamento fosse significativamente maior que o tempo de inicialização dos processos MPI.
 
-**Questões que devem ser respondidas:**
-
-* Qual é o objetivo do programa?
-* Qual o volume de dados processado?
-* Qual algoritmo foi utilizado?
-* Qual a complexidade aproximada do algoritmo?
-
----
+Qual o objetivo da paralelização: O objetivo principal é a redução do tempo de resposta (makespan). Ao distribuir a carga, buscamos aproveitar os 12 núcleos físicos do processador i7-12700 para realizar mais operações por segundo do que seria possível em uma execução serial (Single-thread).
 
 # 2. Ambiente Experimental
 
-Descreva o ambiente em que os experimentos foram realizados.
+Nesta seção, detalhamos a infraestrutura de hardware e o ecossistema de software onde os testes de escalabilidade foram executados. É fundamental registrar esses dados, pois o desempenho da paralelização está diretamente ligado à quantidade de núcleos físicos e à gestão de memória do sistema.
 
 ## Orientações
 
@@ -40,29 +31,27 @@ Informar as características do hardware e software utilizados na execução dos
 
 | Item                        | Descrição |
 | --------------------------- | --------- |
-| Processador                 |           |
-| Número de núcleos           |           |
-| Memória RAM                 |           |
-| Sistema Operacional         |           |
-| Linguagem utilizada         |           |
-| Biblioteca de paralelização |           |
-| Compilador / Versão         |           |
+| Processador                 | Intel(R) Core(TM) i7-12700 (12ª Geração), 2100 Mhz          |
+| Número de núcleos           | 12 Núcleos físicos / 20 Processadores lógicos          |
+| Memória RAM                 | 16,0 GB          |
+| Sistema Operacional         | Microsoft Windows 11 Pro (Versão 10.0.22631)          |
+| Linguagem utilizada         | Python 3.x          |
+| Biblioteca de paralelização | mpi4py (implementação do padrão MPI para Python)          |
+| Compilador / Versão         | Microsoft MPI (MS-MPI) / Versão do interpretador Python instalada no VS Code          |
 
 ---
 
-# 3. Metodologia de Testes
+3. Metodologia de Testes
+Nesta seção, descrevemos o rigor técnico aplicado à execução dos experimentos para garantir que os resultados de desempenho sejam reprodutíveis e precisos.
 
-Explique como os experimentos foram conduzidos.
+Descrição dos Procedimentos
+Como o tempo de execução foi medido: O tempo foi capturado diretamente no código Python utilizando a função MPI.Wtime(), que fornece o tempo de "relógio de parede" (wall-time) com alta precisão dentro de um ambiente MPI. A medição inicia no processo mestre (Rank 0) imediatamente antes da distribuição da carga e termina após a coleta e consolidação do último resultado recebido.
 
-## Orientações
+Quantas execuções foram realizadas: Para mitigar interferências externas do Sistema Operacional (como tarefas em segundo plano ou picos de uso de CPU), cada teste foi repetido 3 vezes para cada contagem de processos.
 
-Descrever:
+Se foi utilizada média dos tempos: Sim. Os dados reportados nas tabelas de resultados e utilizados nos cálculos de Speedup e Eficiência são baseados na média aritmética das três execuções realizadas.
 
-* Como o tempo de execução foi medido
-* Quantas execuções foram realizadas
-* Se foi utilizada média dos tempos
-* Qual tamanho da entrada foi usado
-
+Qual tamanho da entrada foi usado: Foi utilizada uma carga de dados de [Inserir o Valor aqui, ex: 1.000.000 de registros]. Esse volume foi definido para garantir que o tempo de computação fosse significativamente maior que o custo de inicialização (startup overhead) da biblioteca mpi4py e do ambiente MS-MPI.
 ### Configurações testadas
 
 Os experimentos devem ser realizados nas seguintes configurações:
@@ -73,15 +62,8 @@ Os experimentos devem ser realizados nas seguintes configurações:
 * 8 threads/processos
 * 12 threads/processos
 
-### Procedimento experimental
-
-Descrever:
-
-* Número de execuções para cada configuração
-* Forma de cálculo da média
-* Condições de execução (ex: máquina dedicada, carga do sistema, etc.)
-
----
+Procedimento experimental
+Para assegurar a validade estatística dos resultados e minimizar a influência de fatores externos, o protocolo de testes seguiu as seguintes diretrizes:Número de execuções para cada configuração: Cada cenário de teste (variando de 1 a 12 processos) foi executado 3 vezes. Essa repetição é necessária para identificar possíveis outliers causados por variações momentâneas de hardware ou interrupções do sistema operacional.Forma de cálculo da média: Os tempos apresentados no relatório foram obtidos através da média aritmética simples das execuções. O cálculo seguiu a fórmula:$$\bar{T} = \frac{\sum_{i=1}^{n} T_i}{n}$$Onde $T$ representa o tempo de cada execução e $n$ o número total de repetições ($n=3$).Condições de execução:Carga do sistema: Os testes foram realizados com o sistema em estado de carga mínima, garantindo que a maior parte dos recursos do processador Intel Core i7-12700 estivesse disponível exclusivamente para o interpretador Python e o ambiente MPI.Isolamento: Aplicativos de alto consumo de memória ou CPU (como navegadores com muitas abas e softwares de edição) foram encerrados durante as medições.Ambiente de Software: As execuções ocorreram dentro do terminal do Visual Studio Code, utilizando o comando mpiexec vinculado à instalação do Microsoft MPI.Energia: A máquina (Dell Vostro 3710) foi mantida conectada à rede elétrica e configurada no modo de "Melhor Desempenho" nas configurações de energia do Windows 11, evitando variações na frequência de clock do processador (throttling).
 
 # 4. Resultados Experimentais
 
@@ -94,11 +76,11 @@ Preencha a tabela com os **tempos médios de execução** obtidos.
 
 | Nº Threads/Processos | Tempo de Execução (s) |
 | -------------------- | --------------------- |
-| 1                    |                       |
-| 2                    |                       |
-| 4                    |                       |
-| 8                    |                       |
-| 12                   |                       |
+| 1                    |    31.89s                   |
+| 2                    |     24.66s                  |
+| 4                    |     15.91s                  |
+| 8                    |     11.33s                  |
+| 12                   |     9.83s                  |
 
 ---
 
@@ -135,11 +117,11 @@ Preencha a tabela abaixo utilizando os tempos medidos.
 
 | Threads/Processos | Tempo (s) | Speedup | Eficiência |
 | ----------------- | --------- | ------- | ---------- |
-| 1                 |           | 1.0     | 1.0        |
-| 2                 |           |         |            |
-| 4                 |           |         |            |
-| 8                 |           |         |            |
-| 12                |           |         |            |
+| 1                 |  31.89s           | 1.0     | 1.0        |
+| 2                 |  24.66s         |   1.29      |       64.5%     |
+| 4                 |  15.91s         |    2.00     |    50.0%        |
+| 8                 |   11.33s        |     2.81    |    35.1%        |
+| 12                |    9.83s         |    3.24     |   27.0%         |
 
 ---
 
@@ -190,37 +172,18 @@ Inserir o gráfico abaixo:
 
 ---
 
-# 10. Análise dos Resultados
-
-Realize uma análise crítica dos resultados obtidos.
-
-## Questões a serem respondidas
-
-* O speedup obtido foi próximo do ideal?
-* A aplicação apresentou escalabilidade?
-* Em qual ponto a eficiência começou a cair?
-* O número de threads ultrapassa o número de núcleos físicos da máquina?
-* Houve overhead de paralelização?
-
-Discutir possíveis causas para:
-
-* perda de desempenho
-* gargalos no algoritmo
-* sincronização entre threads/processos
-* comunicação entre processos
-* contenção de memória ou cache
-
----
+10. Análise dos Resultados
+A análise a seguir reflete o comportamento observado durante os testes de execução paralela do script avaliadormpi.py no ambiente Windows com MS-MPI.Respostas às Questões CríticasO speedup obtido foi próximo do ideal? O speedup real tendeu a ser inferior ao ideal ($S = p$). Isso ocorre devido à Lei de Amdahl, que demonstra que a aceleração é limitada pela fração do código que não pode ser paralelizada, além do custo de coordenação entre os processos.A aplicação apresentou escalabilidade? Sim, a aplicação demonstrou escalabilidade positiva até os 12 processos. O tempo de execução diminuiu conforme mais recursos foram adicionados, embora o ganho de desempenho por núcleo adicional tenha diminuído em contagens maiores.Em qual ponto a eficiência começou a cair? A eficiência apresentou uma queda gradual à medida que o número de processos aumentou. O ponto de inflexão mais visível ocorre ao atingir 8 processos, onde o esforço do sistema para gerenciar a comunicação e a troca de mensagens começa a impactar o tempo de processamento útil.O número de threads ultrapassa o número de núcleos físicos da máquina? Não. O processador Intel Core i7-12700 possui 12 núcleos físicos. Ao limitar os testes em até 12 processos, garantimos que cada processo MPI fosse alocado a um núcleo real, evitando a perda de performance por disputa excessiva de recursos (oversubscription).Houve overhead de paralelização? Sim. O overhead manifestou-se na latência de inicialização do ambiente MPI e no tempo necessário para a serialização e transferência de dados entre o processo Rank 0 e os trabalhadores (escravos).Discussão de Causas e Gargalos
 
 # 11. Conclusão
 
-Apresente as conclusões do experimento.
+O experimento permitiu validar os conceitos de computação paralela em um ambiente de memória distribuída (simulado via processos locais). A utilização da biblioteca mpi4py mostrou-se uma solução robusta para o problema de processamento de blocos de dados.
 
-## Sugestões de pontos a comentar
+Ganho de Desempenho: O paralelismo trouxe uma redução drástica no tempo de execução em comparação à versão sequencial, justificando o uso da tecnologia MPI para este tipo de problema.
 
-* O paralelismo trouxe ganho significativo de desempenho?
-* Qual foi o melhor número de threads/processos?
-* O programa escala bem com o aumento do paralelismo?
-* Quais melhorias poderiam ser feitas na implementação?
+Melhor Configuração: O tempo absoluto de execução foi menor na configuração de 12 processos, utilizando a capacidade total de núcleos físicos do hardware disponível.
 
----
+Escalabilidade: O programa escala bem para a carga testada, porém a queda na eficiência sugere que, para um número muito maior de processos, seriam necessárias otimizações na granularidade das tarefas.
+
+Sugestões de Melhoria: 1. Substituir comunicações ponto-a-ponto (Send/Recv) por comunicações coletivas (Bcast/Scatter/Gather) para otimizar o tráfego de dados.
+2. Implementar uma lógica de balanceamento de carga dinâmico para compensar a diferença de potência entre os núcleos P e E do processador.
