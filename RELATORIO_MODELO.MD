@@ -136,7 +136,7 @@ Construa um gráfico mostrando o **tempo de execução em função do número de
 
 Inserir o gráfico abaixo:
 
-![Gráfico Tempo Execução](graficos_tempo.png)
+![Gráfico Tempo Execução](grafico_tempo.png)
 
 ---
 
